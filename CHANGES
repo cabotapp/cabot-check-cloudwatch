@@ -1,5 +1,5 @@
-master
-------
+Version 0.1.1
+-------------
 
 * Pre-fill metric and dimensions when editing checks
 * Make autocomplete views require login
