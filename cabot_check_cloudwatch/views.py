@@ -8,6 +8,7 @@ from cabot.cabotapp.views import (CheckCreateView, CheckUpdateView,
                                   StatusCheckForm, base_widgets)
 from dal import autocomplete
 from django import forms
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 
@@ -79,7 +80,7 @@ def duplicate_check(request, pk):
     return HttpResponseRedirect(reverse('update-cloudwatch-check', kwargs={'pk': npk}))
 
 
-class MetricAutocomplete(autocomplete.Select2ListView):
+class MetricAutocomplete(LoginRequiredMixin, autocomplete.Select2ListView):
     def get_list(self):
         result = []
         client = get_boto_client(CloudwatchConfig.objects.get(pk=self.forwarded['cloudwatch_config']))
@@ -92,7 +93,7 @@ class MetricAutocomplete(autocomplete.Select2ListView):
 
         return sorted(set(result))
 
-class DimensionAutocomplete(autocomplete.Select2ListView):
+class DimensionAutocomplete(LoginRequiredMixin, autocomplete.Select2ListView):
     def get_list(self):
         result = []
         client = get_boto_client(CloudwatchConfig.objects.get(pk=self.forwarded['cloudwatch_config']))
