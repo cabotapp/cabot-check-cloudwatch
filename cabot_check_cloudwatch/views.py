@@ -1,3 +1,4 @@
+import ast
 from datetime import datetime
 from os import environ as env
 
@@ -11,21 +12,34 @@ from django import forms
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
+from django.utils import six
 
 from .helpers import get_boto_client
 from .models import CloudwatchConfig, CloudwatchStatusCheck
 
 
+# Custom widget classes to add current value to options
+# Without these the form is wiped when you try to edit
+class ListSelect2(autocomplete.ListSelect2):
+    def optgroups(self, name, value, *args, **kwargs):
+        if len(self.choices) == 0:
+            for v in value:
+                self.choices.insert(0, (v, v))
+        ret = super(ListSelect2, self).optgroups(name, value, *args,**kwargs)
+        return ret
+
+
+class Select2Multiple(autocomplete.Select2Multiple):
+    def optgroups(self, name, value, *args, **kwargs):
+        value = [ast.literal_eval(v) for v in value][0]
+        if len(self.choices) == 0:
+            for v in value:
+                self.choices.insert(0, (v, v))
+        return super(Select2Multiple, self).optgroups(name, value, *args,**kwargs)
+
+
 class CloudwatchStatusCheckForm(StatusCheckForm):
     symmetrical_fields = ('service_set', 'instance_set')
-
-    dimensions = forms.CharField(
-        help_text='Dimensions',
-        widget=autocomplete.Select2Multiple(
-            url='cloudwatch-dimension-autocomplete',
-            forward=['cloudwatch_config', 'cloudwatch_metric'],
-        ),
-    )
 
     class Meta:
         model = CloudwatchStatusCheck
@@ -49,9 +63,16 @@ class CloudwatchStatusCheckForm(StatusCheckForm):
                 'style': 'width: 100px',
                 'placeholder': 'threshold value',
             }),
-            'cloudwatch_metric': autocomplete.ListSelect2(
+            'cloudwatch_metric': ListSelect2(
                 url='cloudwatch-metric-autocomplete',
                 forward=['cloudwatch_config'],
+                attrs={
+                    'style': 'width: 100%',
+                }
+            ),
+            'dimensions': Select2Multiple(
+                url='cloudwatch-dimension-autocomplete',
+                forward=['cloudwatch_config', 'cloudwatch_metric'],
                 attrs={
                     'style': 'width: 100%',
                 }
