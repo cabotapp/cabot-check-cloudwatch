@@ -30,11 +30,15 @@ class CloudwatchStatusCheck(StatusCheck):
 
     def parsed_dimensions(self):
         results = []
-        for name, value in [dim.split('=') for dim in ast.literal_eval(self.dimensions)]:
-            results.append({
-                "Name": name,
-                "Value": value,
-            })
+        try:
+            for name, value in [dim.split('=') for dim in ast.literal_eval(self.dimensions)]:
+                results.append({
+                    "Name": name,
+                    "Value": value,
+                })
+        except SyntaxError:
+            pass
+
         return results
 
     def _run(self):

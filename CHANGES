@@ -1,3 +1,8 @@
+master
+------
+
+* Fix errors with ast syntaxerrors when creating new check
+
 Version 0.1.1
 -------------
 

@@ -31,10 +31,14 @@ class ListSelect2(autocomplete.ListSelect2):
 
 class Select2Multiple(autocomplete.Select2Multiple):
     def optgroups(self, name, value, *args, **kwargs):
-        value = [ast.literal_eval(v) for v in value][0]
-        if len(self.choices) == 0:
-            for v in value:
-                self.choices.insert(0, (v, v))
+        try:
+            value = [ast.literal_eval(v) for v in value][0]
+            if len(self.choices) == 0:
+                for v in value:
+                    self.choices.insert(0, (v, v))
+        except SyntaxError:
+            pass
+
         return super(Select2Multiple, self).optgroups(name, value, *args,**kwargs)
 
 
