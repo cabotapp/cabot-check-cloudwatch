@@ -130,6 +130,4 @@ class DimensionAutocomplete(LoginRequiredMixin, autocomplete.Select2ListView):
                 if self.q.lower() in dimension_string.lower():
                     result.append(dimension_string)
 
-        # resp = client.get_metric_statistics(Namespace=namespace,MetricName=metric_name,Dimensions=dimensions,StartTime=start_time,EndTime=end_time,Period=60,Statistics=['SampleCount','Average','Sum','Minimum','Maximum',],)
-
         return sorted(set(result))
