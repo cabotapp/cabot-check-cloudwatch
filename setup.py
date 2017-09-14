@@ -6,7 +6,7 @@ from setuptools import find_packages, setup
 requirements = [str(req.req) for req in parse_requirements('requirements.txt', session=False)]
 
 setup(name='cabot_check_cloudwatch',
-      version='0.1.1',
+      version='0.1.2',
       description='A clouwatch check plugin for Cabot by Arachnys',
       author='Arachnys',
       author_email='techteam@arachnys.com',
